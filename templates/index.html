@@ -2,102 +2,180 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>PDF 文字覆蓋工具 (JavaScript版)</title>
-    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF 自動填寫工具</title>
     <style>
-        body { font-family: sans-serif; margin: 2em; }
-        input[type="text"] { width: 300px; padding: 5px; margin-bottom: 10px; }
-        button { padding: 10px 15px; cursor: pointer; }
+        /* --- 全局樣式 --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 2em;
+        }
+
+        /* --- 主容器 --- */
+        .container {
+            max-width: 700px;
+            margin: 2em auto;
+            background-color: #ffffff;
+            padding: 2em 3em;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5em;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 2em;
+        }
+
+        /* --- 表單區塊樣式 --- */
+        .form-section {
+            background-color: #fafcfe;
+            border: 1px solid #e0e6ed;
+            padding: 1.5em;
+            border-radius: 8px;
+            margin-bottom: 1.5em;
+        }
+        
+        .form-section h2 {
+            border-bottom: 2px solid #e0e6ed;
+            padding-bottom: 0.5em;
+            margin-bottom: 1em;
+            font-size: 1.2em;
+        }
+
+        /* --- 表單元素樣式 --- */
+        label {
+            display: block;
+            margin-top: 1em;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+        }
+
+        /* --- 提交按鈕樣式 --- */
+        input[type="submit"] {
+            display: block;
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 2em;
+            transition: background-color 0.2s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
 
-    <h1>PDF 表格填寫</h1>
-    <p>這個工具完全在您的瀏覽器中運行，您的檔案不會被上傳到任何地方。</p>
+    <div class="container">
+        <h1>PDF 表格填寫</h1>
+        <p>請選擇要生成的 PDF 範本，網頁將會顯示對應的欄位。</p>
 
-    <label for="pdfFile">選擇您的 PDF 範本:</label><br>
-    <input type="file" id="pdfFile" accept=".pdf"><br><br>
+        <form action="/generate-pdf" method="post">
 
-    <label for="license_plate">車輛登記(車牌)號碼:</label><br>
-    <input type="text" id="license_plate" placeholder="AB1234"><br>
+            <div class="form-section">
+                <h2>1. 選擇 PDF 範本</h2>
+                <label for="pdf_template">選擇文件:</label>
+                <select id="pdf_template" name="pdf_template">
+                    <option value="target.pdf">範本 1 (取消車輛登記通知書)</option>
+                    <option value="target2.pdf">範本 2 (車輛拆毀證明書)</option>
+                </select>
+            </div>
 
-    <label for="english_name">英文姓名/公司名稱:</label><br>
-    <input type="text" id="english_name" placeholder="CHAN TAI MAN"><br>
+            <div id="template1_fields" class="form-section">
+                <h2>範本 1 資料</h2>
+                <label for="reg_mark_1">車牌號碼:</label>
+                <input type="text" id="reg_mark_1" name="reg_mark_1">
 
-    <label for="id_number">身分證明文件號碼:</label><br>
-    <input type="text" id="id_number" placeholder="A123456(7)"><br><br>
+                <label for="owner_name_1">英文名:</label>
+                <input type="text" id="owner_name_1" name="owner_name_1">
 
-    <button onclick="modifyPdf()">生成並下載 PDF</button>
+                <label for="id_number_1">身份證號碼:</label>
+                <input type="text" id="id_number_1" name="id_number_1">
+            </div>
+
+            <div id="template2_fields" class="form-section">
+                <h2>範本 2 資料</h2>
+                <label for="chassis_no_2">底盤號碼:</label>
+                <input type="text" id="chassis_no_2" name="chassis_no_2">
+
+                <label for="engine_no_2">引擎號碼:</label>
+                <input type="text" id="engine_no_2" name="engine_no_2">
+
+                <label for="reg_mark_2">車輛登記號碼:</label>
+                <input type="text" id="reg_mark_2" name="reg_mark_2">
+
+                <label for="owner_name_2">登記車主姓名:</label>
+                <input type="text" id="owner_name_2" name="owner_name_2">
+
+                <label for="scrap_date_2">拆毀日期:</label>
+                <input type="text" id="scrap_date_2" name="scrap_date_2">
+            </div>
+
+            <input type="submit" value="生成 PDF">
+        </form>
+    </div>
 
     <script>
-        // 從 CDN 取得 pdf-lib 的物件
-        const { PDFDocument } = PDFLib;
+        // 這個函式用於切換顯示的欄位
+        function toggleFields() {
+            const selectedValue = document.getElementById('pdf_template').value;
+            const template1Fields = document.getElementById('template1_fields');
+            const template2Fields = document.getElementById('template2_fields');
 
-        // 主要的非同步函式，用於修改 PDF
-        async function modifyPdf() {
-            // 獲取使用者選擇的 PDF 檔案
-            const fileInput = document.getElementById('pdfFile');
-            if (fileInput.files.length === 0) {
-                alert("請先選擇一個 PDF 範本檔案！");
-                return;
+            if (selectedValue === 'target.pdf') {
+                template1Fields.style.display = 'block'; // 顯示範本 1 的欄位
+                template2Fields.style.display = 'none';  // 隱藏範本 2 的欄位
+            } else if (selectedValue === 'target2.pdf') {
+                template1Fields.style.display = 'none';  // 隱藏範本 1 的欄位
+                template2Fields.style.display = 'block'; // 顯示範本 2 的欄位
             }
-            const existingPdfBytes = await fileInput.files[0].arrayBuffer();
-
-            // 載入 PDF 檔案
-            const pdfDoc = await PDFDocument.load(existingPdfBytes);
-
-            // 取得 PDF 的第一頁
-            const pages = pdfDoc.getPages();
-            const firstPage = pages[0];
-
-            // 獲取頁面的寬度和高度，用於座標轉換
-            const { width, height } = firstPage.getSize();
-
-            // 獲取輸入框中的文字
-            const licensePlate = document.getElementById('license_plate').value;
-            const englishName = document.getElementById('english_name').value;
-            const idNumber = document.getElementById('id_number').value;
-
-            // 在指定座標上繪製文字
-            // 注意：pdf-lib 的座標系統原點 (0,0) 同樣在左下角
-            // 所以我們需要用頁面高度來轉換 Y 座標
-            firstPage.drawText(licensePlate, {
-                x: 436,
-                y: height - 70,
-                size: 12, // 您可以調整字體大小
-            });
-
-            firstPage.drawText(englishName, {
-                x: 118,
-                y: height - 144,
-                size: 12,
-            });
-
-            firstPage.drawText(idNumber, {
-                x: 435,
-                y: height - 173,
-                size: 12,
-            });
-
-            // 將修改後的 PDF 儲存為位元組 (bytes)
-            const pdfBytes = await pdfDoc.save();
-
-            // 觸發瀏覽器下載
-            download(pdfBytes, "generated_form.pdf", "application/pdf");
         }
 
-        // 這是觸發下載的輔助函式
-        function download(data, filename, type) {
-            const blob = new Blob([data], { type: type });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        }
+        // 1. 讓網頁載入時，就先執行一次，確保初始狀態正確
+        window.onload = toggleFields;
+
+        // 2. 當使用者每次切換下拉選單時，都執行一次
+        document.getElementById('pdf_template').addEventListener('change', toggleFields);
     </script>
 
 </body>
