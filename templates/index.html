@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF 文字覆蓋工具 (JavaScript版)</title>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        input[type="text"] { width: 300px; padding: 5px; margin-bottom: 10px; }
+        button { padding: 10px 15px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>PDF 表格填寫</h1>
+    <p>這個工具完全在您的瀏覽器中運行，您的檔案不會被上傳到任何地方。</p>
+
+    <label for="pdfFile">選擇您的 PDF 範本:</label><br>
+    <input type="file" id="pdfFile" accept=".pdf"><br><br>
+
+    <label for="license_plate">車輛登記(車牌)號碼:</label><br>
+    <input type="text" id="license_plate" placeholder="AB1234"><br>
+
+    <label for="english_name">英文姓名/公司名稱:</label><br>
+    <input type="text" id="english_name" placeholder="CHAN TAI MAN"><br>
+
+    <label for="id_number">身分證明文件號碼:</label><br>
+    <input type="text" id="id_number" placeholder="A123456(7)"><br><br>
+
+    <button onclick="modifyPdf()">生成並下載 PDF</button>
+
+    <script>
+        // 從 CDN 取得 pdf-lib 的物件
+        const { PDFDocument } = PDFLib;
+
+        // 主要的非同步函式，用於修改 PDF
+        async function modifyPdf() {
+            // 獲取使用者選擇的 PDF 檔案
+            const fileInput = document.getElementById('pdfFile');
+            if (fileInput.files.length === 0) {
+                alert("請先選擇一個 PDF 範本檔案！");
+                return;
+            }
+            const existingPdfBytes = await fileInput.files[0].arrayBuffer();
+
+            // 載入 PDF 檔案
+            const pdfDoc = await PDFDocument.load(existingPdfBytes);
+
+            // 取得 PDF 的第一頁
+            const pages = pdfDoc.getPages();
+            const firstPage = pages[0];
+
+            // 獲取頁面的寬度和高度，用於座標轉換
+            const { width, height } = firstPage.getSize();
+
+            // 獲取輸入框中的文字
+            const licensePlate = document.getElementById('license_plate').value;
+            const englishName = document.getElementById('english_name').value;
+            const idNumber = document.getElementById('id_number').value;
+
+            // 在指定座標上繪製文字
+            // 注意：pdf-lib 的座標系統原點 (0,0) 同樣在左下角
+            // 所以我們需要用頁面高度來轉換 Y 座標
+            firstPage.drawText(licensePlate, {
+                x: 436,
+                y: height - 70,
+                size: 12, // 您可以調整字體大小
+            });
+
+            firstPage.drawText(englishName, {
+                x: 118,
+                y: height - 144,
+                size: 12,
+            });
+
+            firstPage.drawText(idNumber, {
+                x: 435,
+                y: height - 173,
+                size: 12,
+            });
+
+            // 將修改後的 PDF 儲存為位元組 (bytes)
+            const pdfBytes = await pdfDoc.save();
+
+            // 觸發瀏覽器下載
+            download(pdfBytes, "generated_form.pdf", "application/pdf");
+        }
+
+        // 這是觸發下載的輔助函式
+        function download(data, filename, type) {
+            const blob = new Blob([data], { type: type });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+    </script>
+
+</body>
+</html>
