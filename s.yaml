@@ -1,0 +1,25 @@
+edition: 1.0.0
+name: carcarallinone
+access: default  # 與你 local s config add 名稱一致，Actions 自動加載
+services:
+  fc-deploy:
+    component: fc
+    props:
+      region: cn-hongkong           # 你的FC所在區
+      service:
+        name: my-fc-service         # 建議正式命名（也可提前在雲端建立）
+      function:
+        name: my-fc-function
+        runtime: python3.12         # 按你的repo實際Python版本
+        codeUri: ./
+        handler: index.app          # 按 Flask/Wsgi 標準格式設定
+        memorySize: 512
+        timeout: 30
+      triggers:
+        - name: httpTrigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - GET
+              - POST
