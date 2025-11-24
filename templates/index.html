@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF 生成工具</title>
+    <title>文件生成系統</title>
     <style>
-        /* --- 全局樣式 --- */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: #f4f7f9;
@@ -14,8 +13,6 @@
             margin: 0;
             padding: 2em;
         }
-
-        /* --- 主容器 --- */
         .container {
             max-width: 800px;
             margin: 2em auto;
@@ -24,18 +21,8 @@
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
-
-        h1, h2 {
-            color: #2c3e50;
-            margin-top: 0;
-        }
-        
-        h1 {
-            text-align: center;
-            margin-bottom: 1.5em;
-        }
-
-        /* --- 表單區塊樣式 --- */
+        h1, h2 { color: #2c3e50; margin-top: 0; }
+        h1 { text-align: center; margin-bottom: 1.5em; }
         .form-section {
             background-color: #fafcfe;
             border: 1px solid #e0e6ed;
@@ -43,14 +30,12 @@
             border-radius: 8px;
             margin-bottom: 1.5em;
         }
-        
         .form-section h2 {
             border-bottom: 2px solid #e0e6ed;
             padding-bottom: 0.5em;
             margin-bottom: 1em;
             font-size: 1.2em;
         }
-
         .subsection-title {
             font-size: 0.9em;
             font-weight: bold;
@@ -58,88 +43,27 @@
             margin-top: 1.5em;
             margin-bottom: 0.5em;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-
-        /* --- 表單元素樣式 --- */
-        label {
-            display: block;
-            margin-top: 1em;
-            font-weight: 600;
-            color: #495057;
-            font-size: 0.9em;
+        label { display: block; margin-top: 1em; font-weight: 600; color: #495057; font-size: 0.9em; }
+        input[type="text"], input[type="date"], select {
+            width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box;
+            border: 1px solid #ced4da; border-radius: 5px; font-size: 14px;
         }
-
-        input[type="text"],
-        input[type="date"],
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            box-sizing: border-box;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-
-        input[type="text"]:focus,
-        select:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-
-        /* Grid Layout for compact fields */
-        .grid-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-        }
-        .grid-row-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        /* Checkbox group */
+        input[type="text"]:focus, select:focus { outline: none; border-color: #007bff; }
+        .grid-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .grid-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .checkbox-group {
-            display: flex;
-            gap: 20px;
-            margin-top: 10px;
-            background: #fff;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
+            display: flex; gap: 20px; margin-top: 10px; background: #fff;
+            padding: 10px; border: 1px solid #ced4da; border-radius: 5px;
         }
-        .checkbox-group label {
-            margin-top: 0;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-        .checkbox-group input {
-            margin-right: 8px;
-        }
-
-        /* --- 提交按鈕樣式 --- */
+        .checkbox-group label { margin-top: 0; display: flex; align-items: center; cursor: pointer; }
+        .checkbox-group input { margin-right: 8px; }
         input[type="submit"] {
-            display: block;
-            width: 100%;
-            background-color: #007bff;
-            color: white;
-            padding: 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: 600;
-            margin-top: 2em;
-            transition: background-color 0.2s;
+            display: block; width: 100%; background-color: #007bff; color: white;
+            padding: 15px; border: none; border-radius: 5px; cursor: pointer;
+            font-size: 18px; font-weight: 600; margin-top: 2em;
         }
-
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
+        input[type="submit"]:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
@@ -285,10 +209,8 @@
                 template2Fields.style.display = 'block';
             }
         }
-
         window.onload = toggleFields;
         document.getElementById('pdf_template').addEventListener('change', toggleFields);
     </script>
-
 </body>
 </html>
